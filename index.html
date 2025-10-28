@@ -32,7 +32,7 @@
       var(--bg);
     color:var(--text);
   }
-  a{color:inherit; text-decoration:none}
+  a{color:inherit}
   .wrap{
     max-width:980px; margin:24px auto 80px; padding:0 16px;
   }
@@ -65,7 +65,7 @@
   }
   .panel-body{ padding:16px; display:grid; gap:16px }
 
-  /* Stepper */
+  /* Stepper de referencia */
   .stepper{ display:flex; gap:8px; flex-wrap:wrap }
   .step{
     display:flex; align-items:center; gap:8px;
@@ -114,7 +114,6 @@
   .btn{
     border:1px solid #1f9d48; background: linear-gradient(180deg, var(--brand), var(--brand-2));
     color:#06100d; padding:12px 16px; border-radius:12px; font-weight:700; cursor:pointer;
-    display:inline-flex; align-items:center; justify-content:center; gap:8px;
   }
   .btn.secondary{
     background:linear-gradient(180deg, #ffffff, #f8fafc);
@@ -126,13 +125,6 @@
   .btn.danger{
     background:linear-gradient(180deg, #ef4444, #dc2626); border-color:#b91c1c; color:white;
   }
-  /* WHATSAPP */
-  .btn.wa{
-    border-color:#128C7E;
-    background:linear-gradient(180deg, #25D366, #1ebe5a);
-    color:#052a1f;
-  }
-  .btn.wa svg{ width:18px; height:18px }
 
   .subtle{ color:var(--muted); font-size:13px }
   .divider{ height:1px; background:var(--border); margin:8px 0 }
@@ -172,11 +164,10 @@
   }
   .public-card{
     background:#ffffff; border:1px solid var(--border); border-radius:12px; overflow:hidden; box-shadow: var(--shadow);
-    display:flex; flex-direction:column;
   }
   .public-card .img{ aspect-ratio: 4/3; background:#f1f5f9; overflow:hidden }
   .public-card img{ width:100%; height:100%; object-fit:cover }
-  .public-card .body{ padding:10px; display:grid; gap:8px }
+  .public-card .body{ padding:10px }
   .public-card .price{ color:#16a34a; font-size:14px; }
 
   .kbd{
@@ -303,6 +294,14 @@
         </div>
       </div>
     </section>
+
+    <!-- VISTA PÚBLICA AL FINAL -->
+    <h2 style="font-size:18px; margin:26px 0 10px">Vista pública (fija, al final)</h2>
+    <aside class="preview" id="publicBottom" aria-label="Vista pública final"></aside>
+
+    <p class="subtle" style="margin-top:18px">
+      Tips: <span class="kbd">Arrastrá y soltá</span> imágenes sobre los inputs. Todo se guarda en tu navegador. Exportá tu JSON cuando quieras.
+    </p>
   </div>
 
 <script>
@@ -350,17 +349,6 @@
   }
   function escapeHtml(str){
     return (str || "").replace(/[&<>"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s]));
-  }
-
-  // WHATSAPP: compone url con o sin número
-  function buildWhatsAppURL(product){
-    const phoneDigits = (state.store.phone || "").replace(/\D/g, "");
-    const msg = `Hola! Vi este producto en la tienda y deseo comprarlo: ${product.name} + ${formatARS(product.price)}`;
-    const text = encodeURIComponent(msg);
-    if (phoneDigits) {
-      return `https://wa.me/${phoneDigits}?text=${text}`;
-    }
-    return `https://api.whatsapp.com/send?text=${text}`;
   }
 
   // Refs
@@ -451,11 +439,6 @@
           <div class="subtle">${escapeHtml(p.desc || "")}</div>
         </div>
         <div class="actions" style="padding:0 12px 12px">
-          <!-- WHATSAPP: botón en editor -->
-          <a class="btn wa" href="${buildWhatsAppURL(p)}" target="_blank" rel="noopener" aria-label="Comprar por WhatsApp">
-            <svg viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><path d="M19.11 17.3c-.27-.14-1.6-.79-1.84-.88s-.43-.14-.62.14-.71.88-.86 1.06-.32.21-.59.07a7.61 7.61 0 0 1-2.24-1.38 8.41 8.41 0 0 1-1.56-1.93c-.16-.28 0-.43.12-.6s.28-.32.42-.49a2 2 0 0 0 .28-.47.54.54 0 0 0 0-.5c0-.14-.62-1.49-.85-2.04s-.45-.47-.62-.48h-.53a1 1 0 0 0-.75.35 3.15 3.15 0 0 0-1 2.34 5.46 5.46 0 0 0 1.16 2.9 12.49 12.49 0 0 0 4.77 4.31 16.36 16.36 0 0 0 1.61.6 3.88 3.88 0 0 0 1.79.11 2.92 2.92 0 0 0 1.94-1.37 2.39 2.39 0 0 0 .16-1.38c-.06-.1-.24-.16-.51-.3z"/><path d="M26.72 5.28A13.8 13.8 0 0 0 3.9 20.1L2 28l8.06-1.86A13.8 13.8 0 0 0 28 15.87a13.77 13.77 0 0 0-1.28-10.59zm-5.53 17.79a10.92 10.92 0 0 1-5.53 1.51 10.72 10.72 0 0 1-5.49-1.5l-.4-.24-4.78 1.1 1.02-4.66-.26-.43A10.79 10.79 0 1 1 26.2 16a10.66 10.66 0 0 1-4.99 7.07z"/></svg>
-            WhatsApp
-          </a>
           <button class="btn secondary" data-edit="${p.id}">Editar</button>
           <button class="btn danger" data-del="${p.id}">Borrar</button>
         </div>
@@ -544,11 +527,6 @@
                   <div class="name"><strong>${escapeHtml(p.name)}</strong></div>
                   <div class="price">${formatARS(p.price)}</div>
                   ${p.desc ? `<div class="subtle">${escapeHtml(p.desc)}</div>` : ""}
-                  <!-- WHATSAPP: botón en vista pública -->
-                  <a class="btn wa" href="${buildWhatsAppURL(p)}" target="_blank" rel="noopener" aria-label="Comprar por WhatsApp">
-                    <svg viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><path d="M19.11 17.3c-.27-.14-1.6-.79-1.84-.88s-.43-.14-.62.14-.71.88-.86 1.06-.32.21-.59.07a7.61 7.61 0 0 1-2.24-1.38 8.41 8.41 0 0 1-1.56-1.93c-.16-.28 0-.43.12-.6s.28-.32.42-.49a2 2 0 0 0 .28-.47.54.54 0 0 0 0-.5c0-.14-.62-1.49-.85-2.04s-.45-.47-.62-.48h-.53a1 1 0 0 0-.75.35 3.15 3.15 0 0 0-1 2.34 5.46 5.46 0 0 0 1.16 2.9 12.49 12.49 0 0 0 4.77 4.31 16.36 16.36 0 0 0 1.61.6 3.88 3.88 0 0 0 1.79.11 2.92 2.92 0 0 0 1.94-1.37 2.39 2.39 0 0 0 .16-1.38c-.06-.1-.24-.16-.51-.3z"/><path d="M26.72 5.28A13.8 13.8 0 0 0 3.9 20.1L2 28l8.06-1.86A13.8 13.8 0 0 0 28 15.87a13.77 13.77 0 0 0-1.28-10.59zm-5.53 17.79a10.92 10.92 0 0 1-5.53 1.51 10.72 10.72 0 0 1-5.49-1.5l-.4-.24-4.78 1.1 1.02-4.66-.26-.43A10.79 10.79 0 1 1 26.2 16a10.66 10.66 0 0 1-4.99 7.07z"/></svg>
-                    WhatsApp
-                  </a>
                 </div>
               </article>
             `).join("")
@@ -618,4 +596,3 @@
 </script>
 </body>
 </html>
-
